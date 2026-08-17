@@ -27,9 +27,7 @@ df["start_time"] = pd.to_datetime(df["start_time"])
     # Отбор некорректных строк (ушло 1188)
 df.drop_duplicates(inplace=True)    # 358 дубликатов удалено
 df = df[df["duration_min"] > 0]     # 830 строк удалено в связи с некорректным значением duration_min
-#df.dropna(inplace=True)     # 1189 строк удалено из-за недостатка данных (NaN)
-#print(df.head(10))
-#print()
+#df.dropna(inplace=True)     # 1189 строк удалено из-за недостатка данных (NaN), но в данной задаче нет смысла избавляться от NaN
 
     # Сглаженный средний прирост кол-ва поездок в день
 daily = (
@@ -42,8 +40,6 @@ daily = (
 
 daily["groups_rolling30"] = daily.groupby("station")["trips"].rolling(window=30, min_periods=7).sum().reset_index()["trips"]
 daily["difference"] = daily.groupby("station")["groups_rolling30"].transform(lambda s: s.diff())
-#print(daily.groupby("station")["difference"].mean().sort_values(ascending=False).reset_index())
-#print()
 
     # Средний прирост кол-ва поездок в месяц
 monthly = (
@@ -54,15 +50,10 @@ monthly = (
         .reset_index()
 )
 monthly["difference"] = monthly.groupby("station")["trips"].diff()
-#print(monthly.groupby("station")["difference"].mean().sort_values(ascending=False).reset_index())
-#print()
-
 
 df_duration = df.copy()
 df_duration = clean_duration_group(df_duration)
 df_duration.dropna(subset="duration_min")
-#print(df_duration.head(10))
-#print()
 
     # Сглаженный средний прирост часов езды в день
 
@@ -76,8 +67,6 @@ daily_duration = (
 
 daily_duration["groups_rolling30"] = daily_duration.groupby("station")["total_duration"].rolling(window=30, min_periods=7).sum().reset_index()["total_duration"]
 daily_duration["difference"] = daily_duration.groupby("station")["groups_rolling30"].transform(lambda s: s.diff())
-#print(daily_duration.groupby("station")["difference"].mean().sort_values(ascending=False).reset_index())
-#print()
 
     # Средний прирост часов езды в месяц
 monthly_duration = (
@@ -89,12 +78,8 @@ monthly_duration = (
 )
 
 monthly_duration["difference"] = monthly_duration.groupby("station")["total_duration"].diff()
-#print(monthly_duration.groupby("station")["difference"].mean().sort_values(ascending=False).reset_index())
-#print()
 
 total_trips = df.groupby("station")["duration_min"].sum().sort_values(ascending=False)
-#print(total_trips)
-
 
 
     #  ГРАФИК 1: Динамика по станциям
